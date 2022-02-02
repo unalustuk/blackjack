@@ -4,11 +4,11 @@ let  dealersHand = []
 let  playersHand = []
 let dealersHandSum = 0
 let playersHandSum = 0
-let cash = 150
+let cash = 1000
 let betTotal = 0
 let hasBlackJack = false
 let isAlive = false
-let isClickStay = false
+let isClickStand = false
 let hitClicked = false
 let dealCheck = false
 const dealerHandEl = document.getElementById("dealerHand-el")
@@ -17,7 +17,7 @@ const dealerPointsEl = document.getElementById("dealerPoints-el")
 const playerPointsEl = document.getElementById("playerPoints-el")
 const dealEl = document.getElementById("deal-el")
 const hitEl = document.getElementById("hit-el")
-const stayEl = document.getElementById("stay-el")
+const standEl = document.getElementById("stand-el")
 const betbtnEl = document.getElementById("betbtn-el")
 const betTotalEl = document.getElementById("bet-el")
 const cashEl = document.getElementById("cash-el")
@@ -33,7 +33,7 @@ cashEl.textContent += cash
 let deck = getDeck()
 shuffle(deck)
 
-
+//create deck
 function getDeck(){
 	let deck = new Array();
 	for(let i = 0; i < suits.length; i++){
@@ -45,6 +45,7 @@ function getDeck(){
 	return deck;
 }
 
+//shuffle deck
 function shuffle(deck){
 
 	for (let i = 0; i < 1000; i++){
@@ -58,51 +59,53 @@ function shuffle(deck){
 }
 
 
-//deal
+//deal new game and start game
 function deal(){
-    dealCheck=true
-    button1Click = false
-    button2Click = false
-    dealersHand = []
-    playersHand = []
-    dealersHandSum = 0
-    playersHandSum = 0
-    isAlive = true
-    hitClicked = false
-    isClickStay = false
-    hasBlackJack = false
-    stayEl.disabled = false
-    hitEl.disabled = false
-    dealEl.disabled = true
 
-    dealNew()
-    rand = Math.floor((Math.random() * 2))
-
-    for(i = 0; i<2; i++){
-        let card = deck.pop()
-        playersHand.push(card)
-        card = deck.pop()
-        dealersHand.push(card)
+    if (betTotal === 0){
+        messageEl.textContent ="Please make a bet."  //cant play without bet
+    }else {
+        dealCheck=true
+        button1Click = false
+        button2Click = false
+        dealersHand = []
+        playersHand = []
+        dealersHandSum = 0
+        playersHandSum = 0
+        isAlive = true
+        hitClicked = false
+        isClickStand = false
+        hasBlackJack = false
+        standEl.disabled = false
+        hitEl.disabled = false
+        dealEl.disabled = true
+    
+        dealNew()
+        rand = Math.floor((Math.random() * 2))
+    
+        for(i = 0; i<2; i++){
+            let card = deck.pop()
+            playersHand.push(card)
+            card = deck.pop()
+            dealersHand.push(card)
+        }
+        // let card = {Value:"A", Suit: "hearts"}
+        // playersHand.push(card)
+        // card = {Value:"A", Suit: "hearts"}
+        // playersHand.push(card)
+    
+        // card = {Value:"A", Suit: "hearts"}
+        // dealersHand.push(card)
+        // card = {Value:"A", Suit: "hearts"}
+        // dealersHand.push(card)
+        render()
+        // console.log(deck)
+        // console.log(playersHand,dealersHand)
     }
-    // let card = {Value:"A", Suit: "hearts"}
-    // playersHand.push(card)
-    // card = {Value:"A", Suit: "hearts"}
-    // playersHand.push(card)
-
-    // card = {Value:"A", Suit: "hearts"}
-    // dealersHand.push(card)
-    // card = {Value:"A", Suit: "hearts"}
-    // dealersHand.push(card)
-
-
-
-    render()
-    // console.log(deck)
-    // console.log(playersHand,dealersHand)
-
    
 }
 
+// if deck size lower than 20 create new deck
 function dealNew(){
     dealEl.addEventListener("click",() =>{
         if (deck.length < 20){
@@ -115,7 +118,6 @@ function dealNew(){
        
     })  
 }
-
 
 //hit 
 function hit(){
@@ -132,8 +134,8 @@ function hit(){
     
 }
 
-//stay
-function stay() {
+//stand
+function stand() {
     while (dealersHandSum < 17) {
         card = deck.pop()
         dealersHand.push(card)
@@ -146,10 +148,9 @@ function stay() {
             break;
         } 
     }
-    isClickStay = true
+    isClickStand = true
     render()
 }
-
 
 function render(){
     if (!isButton1or2Clicked){
@@ -161,21 +162,18 @@ function render(){
     }else if (playersHandSum === 21){
         hitEl.disabled = true
         hasBlackJack=true
+        messageEl.textContent = "Blackjack!"
     }
     renderStats()
     // console.log(playersHandSum)
     
     
-    if(isAlive === false || isClickStay === true){
+    if(isAlive === false || isClickStand === true){
         winCheck()
     }
    
     // console.log(isAlive)
 }
-
-
-
-
 
 function updatePoints(){
     playersHandSum = 0
@@ -234,6 +232,7 @@ function convert (value) {
         return parseInt(value)
     } 
 }
+
 function dealersConvert (value) {
     if(value === "A"){
               return 1
@@ -243,7 +242,6 @@ function dealersConvert (value) {
           return parseInt(value)
       } 
   }
-
 
 function renderStats () {
    if(!isButton1or2Clicked && playersHand[0].Value === "A" && playersHand[1].Value === "A"){
@@ -270,7 +268,7 @@ function renderStats () {
    dealerPointsEl.textContent = "Dealers Points: "
 
 
-     if (!isClickStay){
+     if (!isClickStand){
         dealerHandEl.textContent = "Dealers Hand: "
         dealerPointsEl.textContent = "Dealers Points: "
     
@@ -317,10 +315,10 @@ function winCheck(){
         }
         dealEl.disabled= false
         hitEl.disabled = true 
-        stayEl.disabled = true
+        standEl.disabled = true
 
         cashEl.textContent = "Cash: $"
-        betTotalEl.textContent = "Bet: $0"
+        betTotalEl.textContent = "Bet: $"
         cashEl.textContent += cash
         betTotal = 0
         betTotalEl.textContent += betTotal
@@ -340,6 +338,7 @@ function value2A() {
     act()
     
 }
+
 let isButton1or2Clicked = false
 function act() {     
    
@@ -363,6 +362,7 @@ function act() {
     })
 }
 
+
 const btns = document.querySelectorAll('button[id^=betbtn-el]')
 
 btns.forEach(btn => {
@@ -372,7 +372,7 @@ btns.forEach(btn => {
    })
 })
 
-function bet(){
+function bet(e){
     // console.log(betAmount)
     if(dealCheck){
         betAmount = 0
@@ -382,15 +382,23 @@ function bet(){
         betAmount=parseInt(betAmount.substr(1,4))
     }
 
+    if (dealCheck){
 
-    if (betAmount > cash){
-       
-    }else if(cash === 0) {
-       
-    }else {
-        betTotal += betAmount
-        cash -= betAmount  
+    }else{
+        if(e.textContent === "RESET BET"){
+            cash += betTotal
+            betTotal = 0
+            betAmount = 0
+        }else if (betAmount > cash){
+           
+        }else if(cash === 0) {
+           
+        }else {
+            betTotal += betAmount
+            cash -= betAmount  
+        }
     }
+  
     
         cashEl.textContent = "Cash: $"
         betTotalEl.textContent = "Bet: $"
