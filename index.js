@@ -11,8 +11,10 @@ let isAlive = false
 let isClickStand = false
 let hitClicked = false
 let dealCheck = false
-const dealerHandEl = document.getElementById("dealerHand-el")
-const playerHandEl = document.getElementById("playerHand-el")
+let isButton1or2Clicked = false
+const playerHandBox = document.getElementById("playerHandBox-el")
+const dealerHandBox = document.getElementById("dealerHandBox-el")
+
 const dealerPointsEl = document.getElementById("dealerPoints-el")
 const playerPointsEl = document.getElementById("playerPoints-el")
 const dealEl = document.getElementById("deal-el")
@@ -57,7 +59,6 @@ function shuffle(deck){
 		deck[location2] = tmp
 	}
 }
-
 
 //deal new game and start game
 function deal(){
@@ -107,16 +108,12 @@ function deal(){
 
 // if deck size lower than 20 create new deck
 function dealNew(){
-    dealEl.addEventListener("click",() =>{
         if (deck.length < 20){
             deck = getDeck()
             shuffle(deck)
             // console.log("getting new")
             // console.log(deck)
-
-    }
-       
-    })  
+        }
 }
 
 //hit 
@@ -151,8 +148,10 @@ function stand() {
     isClickStand = true
     render()
 }
+const restartButton = document.createElement("button")
 
 function render(){
+    console.log(deck)
     if (!isButton1or2Clicked){
         value2A()
     }
@@ -172,7 +171,31 @@ function render(){
         winCheck()
     }
    
+
+    if (betTotal === 0 && cash === 0){
+        const mainDiv = document.getElementById("main")
+        restartButton.innerHTML = "Restart Game"
+        restartButton.setAttribute("onclick","restart()")
+        mainDiv.appendChild(restartButton)
+    }
     // console.log(isAlive)
+}
+
+function restart(){
+    cash = 1000
+    betTotal = 0
+    deck = getDeck()
+    shuffle(deck)
+    restartButton.remove()
+    render()
+    messageEl.textContent = "Welcome to Blackjack!"
+    playerPointsEl.textContent = "Players Points: "
+    dealerPointsEl.textContent = "Dealers Points: "
+    removeAllChildNodes(playerHandBox)
+    removeAllChildNodes(dealerHandBox)
+
+
+
 }
 
 function updatePoints(){
@@ -253,47 +276,81 @@ function renderStats () {
         }
         playerPointsEl.textContent += "2/12"    
    }else {
-        playerHandEl.textContent = "Players Hand: "
-        playerPointsEl.textContent = "Players Points: "
-        
-        for (let i = 0; i<playersHand.length;i++){
-            playerHandEl.textContent += playersHand[i].Value + " "
+        if(playerHandBox.hasChildNodes){
+            removeAllChildNodes(playerHandBox)
+            playerPointsEl.textContent = "Players Points: "
+
+            for (let i = 0; i<playersHand.length;i++){
+                const div = document.createElement("div")
+                const img = document.createElement("img")
+                img.setAttribute("src", `./img/${playersHand[i].Value}${playersHand[i].Suit}.png`)
+                playerHandBox.appendChild(div)
+                div.appendChild(img)
+            }
+            playerPointsEl.textContent += playersHandSum   
+        }else {
+            playerPointsEl.textContent = "Players Points: "
+    
+            for (let i = 0; i<playersHand.length;i++){
+    
+                const div = document.createElement("div")
+                const img = document.createElement("img")
+                img.setAttribute("src", `./img/${playersHand[i].Value}${playersHand[i].Suit}.png`)
+                playerHandBox.appendChild(div)
+                div.appendChild(img)
+                
+                playerHandEl.textContent += playersHand[i].Value + " "
+            }
+            playerPointsEl.textContent += playersHandSum     
+
         }
-        playerPointsEl.textContent += playersHandSum       
    }
-  
-
-
-   dealerHandEl.textContent = "Dealers Hand: "
+   
    dealerPointsEl.textContent = "Dealers Points: "
 
+    if(dealerHandBox.hasChildNodes){
+        removeAllChildNodes(dealerHandBox)
+            if (!isClickStand){
+                const div = document.createElement("div")
+                const img = document.createElement("img")
+                img.setAttribute("src", `./img/${dealersHand[0].Value}${dealersHand[0].Suit}.png`)
+                dealerHandBox.appendChild(div)
+                div.appendChild(img)
+            dealerPointsEl.textContent = "Dealers Points: "
+            dealerPointsEl.textContent += dealersConvert(dealersHand[0].Value) 
+            }else {
+                dealerPointsEl.textContent = "Dealers Points: "
+                for (let i = 0; i<dealersHand.length;i++){
+                    const div = document.createElement("div")
+                    const img = document.createElement("img")
+                    img.setAttribute("src", `./img/${dealersHand[i].Value}${dealersHand[i].Suit}.png`)
+                    dealerHandBox.appendChild(div)
+                    div.appendChild(img)
+                }
+                dealerPointsEl.textContent += dealersHandSum     
+            }
 
-     if (!isClickStand){
-        dealerHandEl.textContent = "Dealers Hand: "
-        dealerPointsEl.textContent = "Dealers Points: "
-    
-        dealerHandEl.textContent += dealersHand[0].Value + " "
-        dealerPointsEl.textContent += dealersConvert(dealersHand[0].Value) 
-    }else {
-        dealerHandEl.textContent = "Dealers Hand: "
-        dealerPointsEl.textContent = "Dealers Points: "
+            if (!isAlive){
+                removeAllChildNodes(dealerHandBox)         
+                dealerPointsEl.textContent = "Dealers Points: "
+                for (let i = 0; i<dealersHand.length;i++){
+                    const div = document.createElement("div")
+                    const img = document.createElement("img")
+                    img.setAttribute("src", `./img/${dealersHand[i].Value}${dealersHand[i].Suit}.png`)
+                    dealerHandBox.appendChild(div)
+                    div.appendChild(img)
+                }
+                dealerPointsEl.textContent += dealersHandSum     
+            }
 
-        for (let i = 0; i<dealersHand.length;i++){
-            dealerHandEl.textContent+= dealersHand[i].Value + " "
-        }
-        dealerPointsEl.textContent += dealersHandSum
     }
-    if (!isAlive){
-        dealerHandEl.textContent = "Dealers Hand: "
-        dealerPointsEl.textContent = "Dealers Points: "
-
-        for (let i = 0; i<dealersHand.length;i++){
-            dealerHandEl.textContent+= dealersHand[i].Value + " "
-        }
-        dealerPointsEl.textContent += dealersHandSum
-    }
-
 }
+
+function removeAllChildNodes(parent) {
+    while (parent.firstChild) {
+        parent.removeChild(parent.firstChild);
+    }
+ }
 
 function winCheck(){
    
@@ -329,7 +386,6 @@ function winCheck(){
 function value2A() {
     if( playersHand[0].Value ==="A" && playersHand[1].Value ==="A"){
         hitEl.disabled = true
-
         button1.textContent = 2
         button2.textContent = 12
         document.body.appendChild(button1)
@@ -339,7 +395,6 @@ function value2A() {
     
 }
 
-let isButton1or2Clicked = false
 function act() {     
    
     button1.addEventListener("click",()=>{
@@ -364,7 +419,6 @@ function act() {
 
 
 const btns = document.querySelectorAll('button[id^=betbtn-el]')
-
 btns.forEach(btn => {
    btn.addEventListener('click', event => {
         betAmount = event.target.textContent 
@@ -407,4 +461,3 @@ function bet(e){
         // console.log(cash,betTotal, betAmount)
         betAmount=0
 }
-
