@@ -80,6 +80,9 @@ function deal(){
         standEl.disabled = false
         hitEl.disabled = false
         dealEl.disabled = true
+        button1Click= false
+        button2Click=false
+        isButton1or2Clicked = false
     
         dealNew()
         rand = Math.floor((Math.random() * 2))
@@ -151,7 +154,7 @@ function stand() {
 const restartButton = document.createElement("button")
 
 function render(){
-    console.log(deck)
+    // console.log(deck)
     if (!isButton1or2Clicked){
         value2A()
     }
@@ -268,11 +271,16 @@ function dealersConvert (value) {
 
 function renderStats () {
    if(!isButton1or2Clicked && playersHand[0].Value === "A" && playersHand[1].Value === "A"){
-        playerHandEl.textContent = "Players Hand: "
+         removeAllChildNodes(playerHandBox)
+
         playerPointsEl.textContent = "Players Points: "
         
         for (let i = 0; i<playersHand.length;i++){
-            playerHandEl.textContent += playersHand[i].Value + " "
+            const div = document.createElement("div")
+            const img = document.createElement("img")
+            img.setAttribute("src", `./img/${playersHand[i].Value}${playersHand[i].Suit}.png`)
+            playerHandBox.appendChild(div)
+            div.appendChild(img)
         }
         playerPointsEl.textContent += "2/12"    
    }else {
@@ -313,9 +321,17 @@ function renderStats () {
             if (!isClickStand){
                 const div = document.createElement("div")
                 const img = document.createElement("img")
+                const div2 = document.createElement("div")
+                const cover = document.createElement("img")
                 img.setAttribute("src", `./img/${dealersHand[0].Value}${dealersHand[0].Suit}.png`)
+                cover.setAttribute("src", `./img/cover.png`)
+
                 dealerHandBox.appendChild(div)
+                dealerHandBox.appendChild(div2)
+
                 div.appendChild(img)
+                div.appendChild(cover)
+
             dealerPointsEl.textContent = "Dealers Points: "
             dealerPointsEl.textContent += dealersConvert(dealersHand[0].Value) 
             }else {
@@ -378,6 +394,8 @@ function winCheck(){
         betTotalEl.textContent = "Bet: $"
         cashEl.textContent += cash
         betTotal = 0
+        
+
         betTotalEl.textContent += betTotal
         dealCheck=false
         
